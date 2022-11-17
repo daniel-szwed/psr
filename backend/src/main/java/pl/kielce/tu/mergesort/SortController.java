@@ -1,9 +1,21 @@
 package pl.kielce.tu.mergesort;
 
+import com.google.gson.Gson;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 public class SortController {
@@ -40,8 +52,7 @@ public class SortController {
             }
             List<Double[]> responses = Collections.synchronizedList(new ArrayList<>());
             requests.parallelStream().forEach(request -> {
-                // TODO: calculate result in separate service
-                Double[] response = mergeTwoSortedArrays(request.getLeft(), request.getRight());
+                Double[] response = mergeTwoSortedArrays(request.getLeft(), request.getRight(), Double[].class);
                 responses.add(response);
             });
             subarrays = responses;
@@ -53,29 +64,33 @@ public class SortController {
         return result;
     }
 
-    public static <T extends Comparable<T>> T[] mergeTwoSortedArrays(T[] one, T[] two) {
-        if (one.length < 1) {
-            return two;
-        }
+    public static <T extends Comparable<T>> T[] mergeTwoSortedArrays(T[] one, T[] two, Class<T[]> tClass) {
+        T[] result = (T[]) Array.newInstance(one[0].getClass(), one.length + two.length);
 
-        T[] sorted = (T[])Array.newInstance(one[0].getClass(), one.length + two.length);
+        CloseableHttpClient httpClient = HttpClients.createDefault();
 
-        int i = 0, j = 0, k = 0;
+        HttpPost request = new HttpPost("http://localhost:8090/merge");
+        Tuple body = new Tuple(one, two);
 
-        while (i < one.length && j < two.length) {
-            if (one[i].compareTo(two[j]) <= 0) {
-                sorted[k++] = one[i++];
-            } else {
-                sorted[k++] = two[j++];
+        Gson gson = new Gson();
+        String json = gson.toJson(body);
+
+        StringEntity stringEntity = new StringEntity(json);
+        request.addHeader("content-type", "application/json");
+        request.setEntity(stringEntity);
+
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                String responseStringContent = EntityUtils.toString(entity);
+                System.out.println(responseStringContent);
+                result = (T[]) gson.fromJson(responseStringContent, result.getClass());
             }
-        }
-        while (i < one.length) {
-            sorted[k++] = one[i++];
-        }
-        while (j < two.length) {
-            sorted[k++] = two[j++];
-        }
 
-        return sorted;
+        } catch (IOException | ParseException exception) {
+            System.out.println("ERROR" + exception.getMessage());
+            exception.printStackTrace();
+        }
+        return result;
     }
 }

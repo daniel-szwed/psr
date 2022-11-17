@@ -1,4 +1,4 @@
-package pl.kielce.tu.mergesort;
+package pl.kielce.tu.mergeservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,10 +7,10 @@ import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerF
 import org.springframework.context.annotation.Configuration;
 
 @SpringBootApplication
-public class MergesortApplication {
+public class MergeServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MergesortApplication.class, args);
+        SpringApplication.run(MergeServiceApplication.class, args);
     }
 
 }
@@ -18,6 +18,6 @@ public class MergesortApplication {
 @Configuration
 class CustomContainer implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
     public void customize(ConfigurableServletWebServerFactory factory){
-        factory.setPort(8080);
+        factory.setPort(8090);
     }
 }
