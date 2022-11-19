@@ -4,11 +4,13 @@ import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
@@ -35,6 +37,11 @@ public class MergeServiceApplication {
         }
     }
 
+    @Bean
+    public RootHost getSomeService(@Value("${rootAddress}") String argumentValue) {
+        return new RootHost(argumentValue);
+    }
+
 }
 
 @Configuration
@@ -43,4 +50,3 @@ class CustomContainer implements WebServerFactoryCustomizer<ConfigurableServletW
         factory.setPort(8090);
     }
 }
-

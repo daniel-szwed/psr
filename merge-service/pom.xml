@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>merge-service</groupId>
-    <artifactId>simple-service</artifactId>
+    <artifactId>merge-service</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>simple-service</name>

@@ -1,15 +1,18 @@
 package pl.kielce.tu.mergeservice;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Array;
 
 @RestController
 public class MergeController {
+    @Autowired
+    private RootHost rootHost;
 
     @RequestMapping("/")
     public String helloWorld(){
-        return "Hello World from Spring Boot";
+        return rootHost.getAddress();
     }
 
     @RequestMapping(value = "/merge", method = RequestMethod.POST, consumes = "application/json")
