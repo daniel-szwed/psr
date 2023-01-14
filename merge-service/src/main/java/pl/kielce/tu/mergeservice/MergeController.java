@@ -10,14 +10,12 @@ public class MergeController {
     @Autowired
     private RootHost rootHost;
 
-    @RequestMapping("/")
-    public String helloWorld(){
-        return rootHost.getAddress();
-    }
-
     @RequestMapping(value = "/merge", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public Double[] sort(@RequestBody Tuple<Double[]> arraysToMerge) {
+        System.out.println(String.format("Tablica A: %s", arraysToMerge.getLeft()));
+        System.out.println(String.format("Tablica B: %s", arraysToMerge.getRight()));
+
         return mergeTwoSortedArrays(arraysToMerge.getLeft(), arraysToMerge.getRight());
     }
 

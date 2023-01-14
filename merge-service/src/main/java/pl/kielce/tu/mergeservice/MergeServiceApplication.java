@@ -4,6 +4,8 @@ import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,33 +22,38 @@ import java.io.IOException;
 @SpringBootApplication
 public class MergeServiceApplication {
 
+    @Autowired
+    public RootHost rootHost;
+
+    @Autowired
+    ApplicationPort applicationPort;
+
     public static void main(String[] args) {
         SpringApplication.run(MergeServiceApplication.class, args);
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpPost request = new HttpPost("http://localhost:8080/register");
+        HttpPost request = new HttpPost(String.format("http://%s/register", rootHost.getAddress()));
+        request.setEntity(new StringEntity(String.valueOf(applicationPort.port)));
 
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
-
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            CloseableHttpResponse response = httpClient.execute(request);
         } catch (IOException exception) {
             System.out.println("ERROR" + exception.getMessage());
             exception.printStackTrace();
         }
     }
 
-    @Bean
-    public RootHost getSomeService(@Value("${rootAddress}") String argumentValue) {
-        return new RootHost(argumentValue);
-    }
 
 }
 
 @Configuration
 class CustomContainer implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
+    @Autowired
+    ApplicationPort applicationPort;
+
     public void customize(ConfigurableServletWebServerFactory factory){
-        factory.setPort(8090);
+        factory.setPort(applicationPort.port);
     }
 }

@@ -28,8 +28,8 @@ public class SortController {
     private MergeServiceProvider mergeServiceProvider;
 
     @RequestMapping("/register")
-    public String register(HttpServletRequest request) {
-        String remoteAddress = request.getRemoteHost();
+    public String register(HttpServletRequest request, @RequestBody String port) {
+        String remoteAddress = request.getRemoteHost() + ":" + port;
         mergeServiceProvider.addNode(remoteAddress);
         return remoteAddress;
     }
@@ -101,7 +101,7 @@ public class SortController {
         String address = mergeServiceProvider.getNextNodeAddress();
         int counter = 0;
         while(counter < 10) {
-            HttpPost request = new HttpPost(String.format("http://%s:8090/merge", address));
+            HttpPost request = new HttpPost(String.format("http://%s/merge", address));
             Tuple body = new Tuple(one, two);
 
             Gson gson = new Gson();
@@ -115,6 +115,7 @@ public class SortController {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     String responseStringContent = EntityUtils.toString(entity);
+                    System.out.println("Odpowiedz serwisu scalajacego:");
                     System.out.println(responseStringContent);
                     return (T[]) gson.fromJson(responseStringContent, result.getClass());
                 }
