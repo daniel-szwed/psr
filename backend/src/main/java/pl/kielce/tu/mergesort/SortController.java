@@ -30,6 +30,7 @@ public class SortController {
     @RequestMapping("/register")
     public String register(HttpServletRequest request, @RequestBody String port) {
         String remoteAddress = request.getRemoteHost() + ":" + port;
+        System.out.println(String.format("Zarejestrowano serwis: %s", remoteAddress));
         mergeServiceProvider.addNode(remoteAddress);
         return remoteAddress;
     }
@@ -115,8 +116,8 @@ public class SortController {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     String responseStringContent = EntityUtils.toString(entity);
-                    System.out.println("Odpowiedz serwisu scalajacego:");
-                    System.out.println(responseStringContent);
+                    System.out.println(String.format("Odpowiedz serwisu %s", address));
+                    System.out.println(responseStringContent + "\n");
                     return (T[]) gson.fromJson(responseStringContent, result.getClass());
                 }
 

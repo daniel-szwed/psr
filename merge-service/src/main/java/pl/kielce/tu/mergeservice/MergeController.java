@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 @RestController
 public class MergeController {
@@ -13,10 +14,39 @@ public class MergeController {
     @RequestMapping(value = "/merge", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public Double[] sort(@RequestBody Tuple<Double[]> arraysToMerge) {
-        System.out.println(String.format("Tablica A: %s", arraysToMerge.getLeft()));
-        System.out.println(String.format("Tablica B: %s", arraysToMerge.getRight()));
+        Double[] arrayA = arraysToMerge.getLeft();
+        Double[] arrayB = arraysToMerge.getRight();
+        String logA = "Empty array";
+        String logB = "Empty array";
+        String logAB = "Empty array";
+        if (arrayA != null && arrayA.length > 0) {
+            logA = arrayToString(arrayA, "A");
+        }
+        if (arrayB != null && arrayB.length > 0) {
+            logB = arrayToString(arrayB, "B");
+        }
 
-        return mergeTwoSortedArrays(arraysToMerge.getLeft(), arraysToMerge.getRight());
+        Double[] merged = mergeTwoSortedArrays(arraysToMerge.getLeft(), arraysToMerge.getRight());
+        logAB = arrayToString(merged, "A + B") + "\n";
+        Printer.getInstance()
+                .enqueueLogMessage(logA, logB, logAB)
+                .printMessages();
+
+        return merged;
+    }
+
+    private String arrayToString(Double[] arrayA, String name) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Tablica %s: [", name));
+        Arrays.stream(arrayA)
+                .forEach(item -> {
+                    sb.append(item.toString() + ", ");
+                });
+        sb.deleteCharAt(sb.length() - 1);
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+
+        return sb.toString();
     }
 
     public static <T extends Comparable<T>> T[] mergeTwoSortedArrays(T[] one, T[] two) {

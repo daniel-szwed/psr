@@ -31,6 +31,7 @@ class CircularLinkedList implements CircuralList {
         ListNode listNode = new ListNode(data, head);
         head = listNode;
         numberOfElements++;
+        actualElement = listNode;
     }
 
     public void insertAfterActual(Object data) {
@@ -111,7 +112,9 @@ class CircularLinkedList implements CircuralList {
             if (nodeElement.data.equals(value)) {
                 return true;
             } else {
-                nodeElement = nodeElement.next;
+                if (nodeElement.next != null) {
+                    nodeElement = nodeElement.next;
+                }
                 counter++;
             }
         }

@@ -26,7 +26,7 @@ public class MergeServiceApplication {
     public RootHost rootHost;
 
     @Autowired
-    ApplicationPort applicationPort;
+    public ApplicationPort applicationPort;
 
     public static void main(String[] args) {
         SpringApplication.run(MergeServiceApplication.class, args);
